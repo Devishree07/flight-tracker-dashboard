@@ -34,7 +34,7 @@ This project is designed for beginners to learn **full-stack development** step 
 - Spring Data JPA  
 
 **Frontend:**  
-- HTML, CSS, Bootstrap, JavaScript  
+- HTML, CSS, JavaScript  
 
 **Database:**  
 - MySQL  
