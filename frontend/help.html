@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - SkyFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0E153A, #1B2A6D);
+            color: #FFFFFF;
+            min-height: 100vh;
+			padding-bottom: 80px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .header {
+            background: rgba(10, 16, 35, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(56, 228, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #38E4FF;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .hamburger {
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 200;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 3px;
+            background: #38E4FF;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: #0A1023;
+            border-left: 2px solid #38E4FF;
+            padding: 5rem 2rem 2rem;
+            transition: right 0.3s ease;
+            z-index: 150;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            right: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 140;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+
+        .menu-title {
+            font-size: 0.75rem;
+            color: #B0B8D1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item {
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            color: #FFFFFF;
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(56, 228, 255, 0.1);
+            border-left-color: #38E4FF;
+            padding-left: 1.5rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            background: linear-gradient(135deg, #38E4FF, #1F6BFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #B0B8D1;
+            margin-bottom: 3rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 2rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border-left: 3px solid #38E4FF;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .faq-item:hover {
+            background: rgba(56, 228, 255, 0.1);
+        }
+
+        .faq-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #38E4FF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            color: #B0B8D1;
+            line-height: 1.6;
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .contact-card {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .contact-card:hover {
+            background: rgba(56, 228, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #38E4FF;
+        }
+
+        .contact-info {
+            color: #B0B8D1;
+            font-size: 0.95rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #38E4FF;
+            margin-bottom: 1.5rem;
+        }
+		
+		.footer {
+            background: rgba(10, 16, 35, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(56, 228, 255, 0.2);
+            padding: 0.6rem 1.5rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 90;
+        }
+
+        .footer-content {
+             max-width: 1400px;
+             margin: 0 auto;
+             display: flex;
+             flex-direction: column; 
+             align-items: center;    
+             gap: 0.3rem;
+        }
+
+        
+
+        .footer-text {
+            color: #B0B8D1;
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;    
+            gap: 0.2rem;
+         }
+
+        .footer-links a {
+            color: #38E4FF;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #1F6BFF;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .side-menu {
+                width: 280px;
+                right: -280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">
+            <span>✈️</span>
+            <span>SkyFlow</span>
+        </a>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="menu-overlay" onclick="toggleMenu()"></div>
+
+    <nav class="side-menu">
+        <div class="menu-section">
+            <div class="menu-title">Main</div>
+            <a href="index.html" class="menu-item">Dashboard</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Live Flights</div>
+            <a href="arrivals.html" class="menu-item">Arrivals</a>
+            <a href="departures.html" class="menu-item">Departures</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Tools</div>
+            <a href="search.html" class="menu-item">Smart Search</a>
+            <a href="filters.html" class="menu-item">Filters & Status</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">User Access</div>
+            <a href="login.html" class="menu-item">Login</a>
+            <a href="register.html" class="menu-item">Register</a>
+            <a href="profile.html" class="menu-item">Profile</a>
+            <a href="#" class="menu-item" onclick="handleLogout()">Logout</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Support</div>
+            <a href="about.html" class="menu-item">About Us</a>
+            <a href="help.html" class="menu-item">Help</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Help & Support</h1>
+        <p class="page-subtitle">Find answers to common questions</p>
+
+        <div class="glass-card">
+            <h2 class="card-title">Frequently Asked Questions</h2>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    How do I track a specific flight?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    You can track flights by using the Smart Search feature. Enter the flight number, airline name, or destination city in the search bar and click search. You'll see all matching flights with their current status.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    What do the different status badges mean?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <strong>On Time:</strong> Flight is operating as scheduled<br>
+                    <strong>Delayed:</strong> Flight is running behind schedule<br>
+                    <strong>Boarding:</strong> Passengers are currently boarding<br>
+                    <strong>Landed/Departed:</strong> Flight has arrived or left<br>
+                    <strong>Cancelled:</strong> Flight has been cancelled
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    How often is flight data updated?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Flight information is updated in real-time every 2-3 minutes. You can also manually refresh the data using the "Refresh" button on any page.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    Can I filter flights by status?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Yes! On the Arrivals and Departures pages, you'll find a status filter dropdown. Select any status (On Time, Delayed, Cancelled, etc.) to view only those flights.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    How do I create an account?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Click on "Register" in the menu, fill in your details (name, email, password), accept the terms, and click "Create Account". You'll receive a confirmation and can then log in.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    Is my personal information secure?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Yes, we use industry-standard encryption and security measures to protect your data. Your information is never shared with third parties without your consent.
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="card-title">Contact Support</h2>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="contact-icon">📧</div>
+                    <div class="contact-title">Email Support</div>
+                    <div class="contact-info">support@skyflow.com</div>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">📞</div>
+                    <div class="contact-title">Phone Support</div>
+                    <div class="contact-info">+91 1800 123 4567</div>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">💬</div>
+                    <div class="contact-title">Live Chat</div>
+                    <div class="contact-info">Available 24/7</div>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	<footer class="footer">
+        <div class="footer-content">
+            <div class="footer-text">
+                © 2026 SkyFlow. All rights reserved.
+            </div>
+            <div class="footer-links">
+                 <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="terms-of-service.html">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.querySelector('.side-menu').classList.toggle('active');
+            document.querySelector('.menu-overlay').classList.toggle('active');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleFaq(element) {
+            const answer = element.querySelector('.faq-answer');
+            const allAnswers = document.querySelectorAll('.faq-answer');
+            const allItems = document.querySelectorAll('.faq-item');
+            
+            // Close all other FAQs
+            allAnswers.forEach(a => {
+                if (a !== answer) a.classList.remove('active');
+            });
+            allItems.forEach(i => {
+                if (i !== element) i.classList.remove('active');
+            });
+            
+            // Toggle current FAQ
+            answer.classList.toggle('active');
+            element.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

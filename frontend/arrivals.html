@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrivals - SkyFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0E153A, #1B2A6D);
+            color: #FFFFFF;
+            min-height: 100vh;
+            overflow-x: hidden;
+			padding-bottom: 80px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .header {
+            background: rgba(10, 16, 35, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(56, 228, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #38E4FF;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .hamburger {
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 200;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 3px;
+            background: #38E4FF;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: #0A1023;
+            border-left: 2px solid #38E4FF;
+            padding: 5rem 2rem 2rem;
+            transition: right 0.3s ease;
+            z-index: 150;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            right: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 140;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+
+        .menu-title {
+            font-size: 0.75rem;
+            color: #B0B8D1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item {
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            color: #FFFFFF;
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(56, 228, 255, 0.1);
+            border-left-color: #38E4FF;
+            padding-left: 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #38E4FF, #1F6BFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .search-input, .filter-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid #38E4FF;
+            color: #fff;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input {
+            width: 250px;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            box-shadow: 0 0 20px rgba(56, 228, 255, 0.3);
+            border-color: #38E4FF;
+        }
+
+        .filter-select {
+            cursor: pointer;
+        }
+
+        .filter-select option {
+            background: #0A1023;
+            color: #fff;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+            color: #38E4FF;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #B0B8D1;
+            font-size: 0.9rem;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #00C853;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+        }
+
+        th {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #38E4FF;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(56, 228, 255, 0.08);
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .on-time {
+            background: linear-gradient(135deg, #00C853, #64DD17);
+        }
+
+        .delayed {
+            background: linear-gradient(135deg, #FF6D00, #FF9100);
+        }
+
+        .cancelled {
+            background: linear-gradient(135deg, #D50000, #FF1744);
+        }
+
+        .landed {
+            background: linear-gradient(135deg, #1F6BFF, #38E4FF);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1F6BFF, #38E4FF);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(31, 107, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .side-menu {
+                width: 280px;
+                right: -280px;
+            }
+        }
+		
+		.footer {
+            background: rgba(10, 16, 35, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(56, 228, 255, 0.2);
+            padding: 0.6rem 1.5rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 90;
+        }
+
+        .footer-content {
+             max-width: 1400px;
+             margin: 0 auto;
+             display: flex;
+             flex-direction: column; 
+             align-items: center;    
+             gap: 0.3rem;
+        }
+
+
+        .footer-text {
+            color: #B0B8D1;
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;    
+            gap: 0.2rem;
+         }
+
+        .footer-links a {
+            color: #38E4FF;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #1F6BFF;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">
+            <span>✈️</span>
+            <span>SkyFlow</span>
+        </a>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="menu-overlay" onclick="toggleMenu()"></div>
+
+    <nav class="side-menu">
+        <div class="menu-section">
+            <div class="menu-title">Main</div>
+            <a href="index.html" class="menu-item">Dashboard</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Live Flights</div>
+            <a href="arrivals.html" class="menu-item">Arrivals</a>
+            <a href="departures.html" class="menu-item">Departures</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Tools</div>
+            <a href="search.html" class="menu-item">Smart Search</a>
+            <a href="filters.html" class="menu-item">Filters & Status</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">User Access</div>
+            <a href="login.html" class="menu-item">Login</a>
+            <a href="register.html" class="menu-item">Register</a>
+            <a href="profile.html" class="menu-item">Profile</a>
+            <a href="#" class="menu-item" onclick="handleLogout()">Logout</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Support</div>
+            <a href="about.html" class="menu-item">About Us</a>
+            <a href="help.html" class="menu-item">Help</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Flight Arrivals</h1>
+            <div class="filter-controls">
+                <input type="text" class="search-input" placeholder="Search by flight number..." id="searchInput">
+                <select class="filter-select" id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="on-time">On Time</option>
+                    <option value="delayed">Delayed</option>
+                    <option value="landed">Landed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                <button class="btn btn-primary" onclick="refreshData()">Refresh</button>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="table-header">
+                <h2 class="table-title">Incoming Flights</h2>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span>Live Updates</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="arrivalsTable">
+                    <thead>
+                        <tr>
+                            <th>Flight No.</th>
+                            <th>Airline</th>
+                            <th>Origin</th>
+                            <th>Scheduled</th>
+                            <th>Expected</th>
+                            <th>Terminal</th>
+                            <th>Gate</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AI 101</td>
+                            <td>Air India</td>
+                            <td>Delhi (DEL)</td>
+                            <td>10:30 AM</td>
+                            <td>10:30 AM</td>
+                            <td>T2</td>
+                            <td>A12</td>
+                            <td><span class="status-badge on-time">On Time</span></td>
+                        </tr>
+                        <tr>
+                            <td>6E 245</td>
+                            <td>IndiGo</td>
+                            <td>Mumbai (BOM)</td>
+                            <td>11:15 AM</td>
+                            <td>11:45 AM</td>
+                            <td>T1</td>
+                            <td>B7</td>
+                            <td><span class="status-badge delayed">Delayed</span></td>
+                        </tr>
+                        <tr>
+                            <td>SG 892</td>
+                            <td>SpiceJet</td>
+                            <td>Bangalore (BLR)</td>
+                            <td>12:00 PM</td>
+                            <td>12:00 PM</td>
+                            <td>T1</td>
+                            <td>C3</td>
+                            <td><span class="status-badge landed">Landed</span></td>
+                        </tr>
+                        <tr>
+                            <td>UK 567</td>
+                            <td>Vistara</td>
+                            <td>Chennai (MAA)</td>
+                            <td>01:45 PM</td>
+                            <td>01:45 PM</td>
+                            <td>T2</td>
+                            <td>A8</td>
+                            <td><span class="status-badge on-time">On Time</span></td>
+                        </tr>
+                        <tr>
+                            <td>AI 305</td>
+                            <td>Air India</td>
+                            <td>Kolkata (CCU)</td>
+                            <td>02:15 PM</td>
+                            <td>03:00 PM</td>
+                            <td>T2</td>
+                            <td>A15</td>
+                            <td><span class="status-badge delayed">Delayed</span></td>
+                        </tr>
+                        <tr>
+                            <td>6E 789</td>
+                            <td>IndiGo</td>
+                            <td>Hyderabad (HYD)</td>
+                            <td>03:30 PM</td>
+                            <td>03:30 PM</td>
+                            <td>T1</td>
+                            <td>B12</td>
+                            <td><span class="status-badge on-time">On Time</span></td>
+                        </tr>
+                        <tr>
+                            <td>SG 456</td>
+                            <td>SpiceJet</td>
+                            <td>Pune (PNQ)</td>
+                            <td>04:00 PM</td>
+                            <td>-</td>
+                            <td>T1</td>
+                            <td>-</td>
+                            <td><span class="status-badge cancelled">Cancelled</span></td>
+                        </tr>
+                        <tr>
+                            <td>UK 234</td>
+                            <td>Vistara</td>
+                            <td>Ahmedabad (AMD)</td>
+                            <td>05:15 PM</td>
+                            <td>05:15 PM</td>
+                            <td>T2</td>
+                            <td>A5</td>
+                            <td><span class="status-badge on-time">On Time</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+	
+	<footer class="footer">
+        <div class="footer-content">
+            <div class="footer-text">
+                © 2026 SkyFlow. All rights reserved.
+            </div>
+            <div class="footer-links">
+                 <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="terms-of-service.html">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.querySelector('.side-menu').classList.toggle('active');
+            document.querySelector('.menu-overlay').classList.toggle('active');
+        }
+
+        function refreshData() {
+            alert('Refreshing arrival data... (Will connect to backend API)');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#arrivalsTable tbody tr');
+            
+            rows.forEach(row => {
+                const flightNo = row.cells[0].textContent.toLowerCase();
+                const airline = row.cells[1].textContent.toLowerCase();
+                
+                if (flightNo.includes(searchTerm) || airline.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Status filter
+        document.getElementById('statusFilter').addEventListener('change', function(e) {
+            const status = e.target.value;
+            const rows = document.querySelectorAll('#arrivalsTable tbody tr');
+            
+            rows.forEach(row => {
+                if (status === 'all') {
+                    row.style.display = '';
+                } else {
+                    const statusBadge = row.querySelector('.status-badge');
+                    if (statusBadge.classList.contains(status)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

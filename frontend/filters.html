@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filters & Status - SkyFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0E153A, #1B2A6D);
+            color: #FFFFFF;
+            min-height: 100vh;
+            overflow-x: hidden;
+			padding-bottom: 80px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .header {
+            background: rgba(10, 16, 35, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(56, 228, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #38E4FF;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .hamburger {
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 200;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 3px;
+            background: #38E4FF;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: #0A1023;
+            border-left: 2px solid #38E4FF;
+            padding: 5rem 2rem 2rem;
+            transition: right 0.3s ease;
+            z-index: 150;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            right: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 140;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+
+        .menu-title {
+            font-size: 0.75rem;
+            color: #B0B8D1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item {
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            color: #FFFFFF;
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(56, 228, 255, 0.1);
+            border-left-color: #38E4FF;
+            padding-left: 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #38E4FF, #1F6BFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #B0B8D1;
+            font-size: 1.1rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: #38E4FF;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #B0B8D1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-select, .filter-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(56, 228, 255, 0.3);
+            color: #fff;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            border-color: #38E4FF;
+            box-shadow: 0 0 15px rgba(56, 228, 255, 0.2);
+        }
+
+        .filter-select option {
+            background: #0A1023;
+            color: #fff;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #B0B8D1;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-label:hover {
+            background: rgba(56, 228, 255, 0.1);
+        }
+
+        .checkbox-label input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .status-legend {
+            margin-top: 2rem;
+        }
+
+        .legend-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .legend-item:hover {
+            background: rgba(56, 228, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .on-time {
+            background: linear-gradient(135deg, #00C853, #64DD17);
+        }
+
+        .delayed {
+            background: linear-gradient(135deg, #FF6D00, #FF9100);
+        }
+
+        .cancelled {
+            background: linear-gradient(135deg, #D50000, #FF1744);
+        }
+
+        .boarding {
+            background: linear-gradient(135deg, #1F6BFF, #38E4FF);
+        }
+
+        .landed {
+            background: linear-gradient(135deg, #1F6BFF, #38E4FF);
+        }
+
+        .departed {
+            background: linear-gradient(135deg, #9C27B0, #BA68C8);
+        }
+
+        .legend-text {
+            flex: 1;
+        }
+
+        .legend-description {
+            color: #B0B8D1;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1F6BFF, #38E4FF);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(31, 107, 255, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #38E4FF;
+            color: #38E4FF;
+        }
+
+        .btn-outline:hover {
+            background: rgba(56, 228, 255, 0.1);
+        }
+
+        .time-range {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+		
+		.footer {
+            background: rgba(10, 16, 35, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(56, 228, 255, 0.2);
+            padding: 0.6rem 1.5rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 90;
+        }
+
+        .footer-content {
+             max-width: 1400px;
+             margin: 0 auto;
+             display: flex;
+             flex-direction: column; 
+             align-items: center;    
+             gap: 0.3rem;
+        }
+
+        
+
+        .footer-text {
+            color: #B0B8D1;
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;    
+            gap: 0.2rem;
+         }
+
+        .footer-links a {
+            color: #38E4FF;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #1F6BFF;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .side-menu {
+                width: 280px;
+                right: -280px;
+            }
+
+            .time-range {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">
+            <span>✈️</span>
+            <span>SkyFlow</span>
+        </a>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="menu-overlay" onclick="toggleMenu()"></div>
+
+    <nav class="side-menu">
+        <div class="menu-section">
+            <div class="menu-title">Main</div>
+            <a href="index.html" class="menu-item">Dashboard</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Live Flights</div>
+            <a href="arrivals.html" class="menu-item">Arrivals</a>
+            <a href="departures.html" class="menu-item">Departures</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Tools</div>
+            <a href="search.html" class="menu-item">Smart Search</a>
+            <a href="filters.html" class="menu-item">Filters & Status</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">User Access</div>
+            <a href="login.html" class="menu-item">Login</a>
+            <a href="register.html" class="menu-item">Register</a>
+            <a href="profile.html" class="menu-item">Profile</a>
+            <a href="#" class="menu-item" onclick="handleLogout()">Logout</a>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Support</div>
+            <a href="about.html" class="menu-item">About Us</a>
+            <a href="help.html" class="menu-item">Help</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Filters & Status</h1>
+            <p class="page-subtitle">Customize your flight information view</p>
+        </div>
+
+        <div class="filter-grid">
+            <div class="glass-card">
+                <h2 class="card-title">🔍 Basic Filters</h2>
+
+                <div class="filter-group">
+                    <label class="filter-label">Flight Type</label>
+                    <select class="filter-select" id="flightType">
+                        <option value="all">All Flights</option>
+                        <option value="arrivals">Arrivals Only</option>
+                        <option value="departures">Departures Only</option>
+                        <option value="international">International</option>
+                        <option value="domestic">Domestic</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Airline</label>
+                    <select class="filter-select" id="airline">
+                        <option value="all">All Airlines</option>
+                        <option value="air-india">Air India</option>
+                        <option value="indigo">IndiGo</option>
+                        <option value="spicejet">SpiceJet</option>
+                        <option value="vistara">Vistara</option>
+                        <option value="go-first">Go First</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Terminal</label>
+                    <select class="filter-select" id="terminal">
+                        <option value="all">All Terminals</option>
+                        <option value="t1">Terminal 1</option>
+                        <option value="t2">Terminal 2</option>
+                        <option value="t3">Terminal 3</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                    <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2 class="card-title">⏰ Time Filters</h2>
+
+                <div class="filter-group">
+                    <label class="filter-label">Time Range</label>
+                    <div class="time-range">
+                        <input type="time" class="filter-input" id="timeFrom" value="00:00">
+                        <input type="time" class="filter-input" id="timeTo" value="23:59">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Date</label>
+                    <input type="date" class="filter-input" id="flightDate">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Time of Day</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>Morning (6 AM - 12 PM)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>Afternoon (12 PM - 6 PM)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>Evening (6 PM - 12 AM)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>Night (12 AM - 6 AM)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2 class="card-title">📊 Status Filters</h2>
+
+                <div class="filter-group">
+                    <label class="filter-label">Flight Status</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>On Time</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>Delayed</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>Boarding</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>Landed/Departed</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span>Cancelled</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Delay Threshold</label>
+                    <select class="filter-select" id="delayThreshold">
+                        <option value="any">Any Delay</option>
+                        <option value="15">15+ minutes</option>
+                        <option value="30">30+ minutes</option>
+                        <option value="60">1+ hour</option>
+                        <option value="120">2+ hours</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="card-title">📋 Status Legend</h2>
+            <div class="status-legend">
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <span class="status-badge on-time">On Time</span>
+                        <div class="legend-text">
+                            <div>On Time</div>
+                            <div class="legend-description">Flight is operating according to schedule</div>
+                        </div>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="status-badge delayed">Delayed</span>
+                        <div class="legend-text">
+                            <div>Delayed</div>
+                            <div class="legend-description">Flight is running behind schedule</div>
+                        </div>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="status-badge boarding">Boarding</span>
+                        <div class="legend-text">
+                            <div>Boarding</div>
+                            <div class="legend-description">Passengers are currently boarding the aircraft</div>
+                        </div>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="status-badge landed">Landed</span>
+                        <div class="legend-text">
+                            <div>Landed</div>
+                            <div class="legend-description">Aircraft has arrived at the destination</div>
+                        </div>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="status-badge departed">Departed</span>
+                        <div class="legend-text">
+                            <div>Departed</div>
+                            <div class="legend-description">Aircraft has left the origin airport</div>
+                        </div>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="status-badge cancelled">Cancelled</span>
+                        <div class="legend-text">
+                            <div>Cancelled</div>
+                            <div class="legend-description">Flight has been cancelled</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	<footer class="footer">
+        <div class="footer-content">
+            <div class="footer-text">
+                © 2026 SkyFlow. All rights reserved.
+            </div>
+            <div class="footer-links">
+                 <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="terms-of-service.html">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.querySelector('.side-menu').classList.toggle('active');
+            document.querySelector('.menu-overlay').classList.toggle('active');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        function applyFilters() {
+            const flightType = document.getElementById('flightType').value;
+            const airline = document.getElementById('airline').value;
+            const terminal = document.getElementById('terminal').value;
+            const timeFrom = document.getElementById('timeFrom').value;
+            const timeTo = document.getElementById('timeTo').value;
+            const flightDate = document.getElementById('flightDate').value;
+
+            console.log('Applying filters:', {
+                flightType, airline, terminal, timeFrom, timeTo, flightDate
+            });
+
+            alert('Filters applied! This will be connected to the backend API to fetch filtered results.');
+        }
+
+        function resetFilters() {
+            document.getElementById('flightType').value = 'all';
+            document.getElementById('airline').value = 'all';
+            document.getElementById('terminal').value = 'all';
+            document.getElementById('timeFrom').value = '00:00';
+            document.getElementById('timeTo').value = '23:59';
+            document.getElementById('flightDate').value = '';
+            document.getElementById('delayThreshold').value = 'any';
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+            });
+
+            alert('All filters have been reset!');
+        }
+
+        // Set today's date as default
+        document.getElementById('flightDate').valueAsDate = new Date();
+    </script>
+</body>
+</html>
